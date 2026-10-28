@@ -1,117 +1,152 @@
 # Make Moon Training
 
-This repository contains a small PyTorch neural-network experiment on the classic `make_moons` synthetic dataset. The goal is to train a binary classifier that separates the two crescent-shaped classes and evaluate the model with standard machine-learning metrics.
+This repository demonstrates a machine learning workflow for binary classification on the nonlinear `make_moons` dataset using a small PyTorch neural network. The goal of the project is to learn a curved decision boundary that separates the two crescent-shaped classes and to evaluate the model using both standard classification metrics and additional diagnostic metrics such as correlation and probability-based performance indicators.
 
-## Project overview
+## Approach and methodology
 
-- Dataset: `sklearn.datasets.make_moons`
-- Samples: 1000
-- Noise: 0.2
-- Train/test split: 80/20
-- Model: a 2-layer artificial neural network (input -> hidden -> output)
-- Activation: ReLU
-- Output layer: softmax with cross-entropy loss
-- Optimizer: SGD
+### 1. Dataset generation
+The project uses `sklearn.datasets.make_moons`, which creates a 2D synthetic dataset with two interleaving half-moon shaped classes. This is a classic benchmark for testing whether a model can capture non-linear decision boundaries.
 
-## Why this dataset is useful
+Key dataset settings:
+- Number of samples: 1000
+- Noise level: 0.2
+- Random state: 42
+- Split: 80% training, 20% testing
 
-The `make_moons` dataset is a nonlinear classification problem. A linear classifier cannot capture the curved decision boundary well, so this project is a good example of how a small neural network learns non-linear separation.
+### 2. Preprocessing
+Before model training, the input features are standardized using `StandardScaler`.
+This is important because neural networks train more stably when feature scales are comparable, especially when using optimization methods like SGD.
 
-## Model architecture
-
-The network uses:
-
+### 3. Model architecture
+A simple fully connected neural network is used:
 - Input layer: 2 features
 - Hidden layer: 16 neurons
-- ReLU activation
+- Activation: ReLU
 - Output layer: 2 classes
-- Softmax output probabilities
+- Loss function: CrossEntropyLoss
+- Optimizer: SGD
 
-This setup is simple but effective for modeling the crescent boundaries of the moon-shaped classes.
+This design is compact, efficient, and sufficient to model the non-linear separation between the two moons.
 
-## Observed training results
+### 4. Training process
+The model is trained for 200 epochs while tracking:
+- training loss
+- test loss
+- training accuracy
+- test accuracy
 
-The existing notebook produced the following evaluation metrics on the test set:
+This allows the project to observe whether the model is learning effectively and whether it is overfitting or underfitting.
 
-| Metric | Value | Interpretation |
-| --- | ---: | --- |
-| Accuracy | 0.8150 | The model correctly classified 81.5% of the test samples. |
-| Precision | 0.8000 | Of the samples predicted as the positive class, 80.0% were correct. |
-| Recall | 0.8400 | The model captured 84.0% of the actual positive class samples. |
-| F1-Score | 0.8195 | Balanced performance between precision and recall. |
-
-## Additional metrics included in the evaluation code
-
-The repository now includes a script that computes a broader set of evaluation metrics so the model can be assessed more completely:
-
+### 5. Evaluation strategy
+After training, the model is evaluated on the test set using:
 - Accuracy
 - Precision
 - Recall
 - F1-score
-- Confusion matrix
-- Balanced accuracy
+- Balanced Accuracy
 - ROC-AUC
-- Log loss
-- MCC (Matthews correlation coefficient)
+- Log Loss
+- Matthews Correlation Coefficient (MCC)
 - Pearson correlation coefficient (r)
 - Spearman rank correlation
+- Confusion matrix
 
-## What the metrics mean
+These metrics help assess not only whether the model is correct, but also how confident and balanced its predictions are.
+
+## Techniques used
+
+- Synthetic data generation using `make_moons`
+- Feature scaling with standardization
+- Neural network training in PyTorch
+- Loss tracking across epochs
+- Confusion matrix analysis
+- Probability-based classification metrics
+- Correlation analysis between prediction confidence and label alignment
+
+## Main outputs
+
+The repository generates the following outputs:
+
+1. `MAKE_MOONS_PROJECT.ipynb`  
+   Original notebook containing the full workflow, training logic, plots, and metric calculations.
+
+2. `training_metrics.py`  
+   Reusable Python script that reproduces the training and evaluation workflow in a cleaner, script-based form.
+
+3. `metrics_summary.txt`  
+   Text summary of model performance metrics.
+
+4. `metrics_visualization.png`  
+   Visualization showing loss curves, accuracy curves, and confusion matrix.
+
+## Observed metrics
+
+The notebook output produced the following classification results on the test set:
+
+| Metric | Value | Interpretation |
+| --- | ---: | --- |
+| Accuracy | 0.8150 | 81.5% of test samples were correctly classified. |
+| Precision | 0.8000 | 80.0% of predicted positive cases were correct. |
+| Recall | 0.8400 | 84.0% of actual positive cases were identified. |
+| F1-Score | 0.8195 | Balanced precision/recall performance. |
+
+Additional metrics computed through the evaluation script include:
+- Balanced Accuracy
+- ROC-AUC
+- Log Loss
+- MCC
+- Pearson r
+- Spearman rho
+
+These values provide a more complete assessment of the model's predictive behavior beyond simple accuracy.
+
+## Metric interpretation
 
 ### Accuracy
-Accuracy tells how often the model is correct overall. It is useful for a general summary, but it can be misleading when class balance is uneven.
+Accuracy tells how often the model is correct overall. It is useful as a quick summary, though it can be less informative when the class distribution is not perfectly balanced.
 
 ### Precision
-Precision measures how reliable positive predictions are. A high precision means the model does not label many samples as positive unless it is confident.
+Precision indicates how reliable positive predictions are. A high value means the model rarely predicts the positive class unless it is confident.
 
 ### Recall
-Recall measures how many true positive cases the model successfully catches. A high recall is important when false negatives are costly.
+Recall captures how many true positive samples the model successfully detects. This is especially important when missing a positive case is costly.
 
 ### F1-score
-The F1-score balances precision and recall. It is especially useful when the model is evaluated on a single positive class and class imbalance may affect accuracy.
+The F1-score combines precision and recall into a single metric and is useful when a good balance between false positives and false negatives is required.
+
+### Balanced accuracy
+This metric averages recall across both classes and is helpful when class distribution is uneven or when one class is harder to predict.
 
 ### ROC-AUC
-AUC summarizes the model's ability to rank a positive sample above a negative sample across all thresholds.
+Area under the ROC curve summarizes the model's ability to separate classes across different decision thresholds.
 
 ### Log loss
-Log loss measures confidence calibration. Lower values indicate better probabilistic predictions.
+Log loss evaluates the quality of predicted probabilities. Lower values indicate stronger probabilistic confidence calibration.
 
 ### MCC
-The Matthews correlation coefficient is a balanced classification metric that stays informative even when class distribution is not equal.
+The Matthews Correlation Coefficient is a robust classification metric that captures the quality of all four confusion-matrix entries and is often more informative than raw accuracy in imbalanced scenarios.
 
-### Pearson r / correlation
-Pearson correlation measures the linear relationship between the model's positive-class probability scores and the true labels. This is useful when assessing how strongly the model's confidence aligns with actual class membership.
-
-### Spearman correlation
-Spearman rank correlation checks whether the ordering of scores follows the order of the labels, even when the relationship is not strictly linear.
+### Pearson r and Spearman rho
+These correlation metrics assess how strongly the model's confidence scores align with the true labels. They are useful for understanding whether the model is not only making correct predictions, but also ranking examples in a consistent and meaningful way.
 
 ## Observations
 
-- The model learns the nonlinear structure of the `make_moons` dataset well enough to achieve strong classification performance.
-- The test metrics indicate a good balance between correctly identifying positive examples and avoiding false alarms.
-- The structure of the dataset is challenging because the classes are intertwined; therefore, a modest but meaningful error rate is expected even for a well-performing model.
-- Accuracy alone is not enough for a full model assessment; the additional metrics help show confidence, balance, and ranking quality.
+- The model learns the non-linear structure of the dataset effectively.
+- The two moon-shaped classes are separable with a simple neural network, and the model achieves strong performance on the test set.
+- The results show a good balance between classification correctness and probabilistic confidence.
+- While accuracy is strong, the broader metric set provides better confidence that the model is robust and not simply overfitting to one class.
+- The dataset is a classic example of a task where linear models fail but shallow neural networks succeed.
 
-## Run the evaluation
-
-Use the repository script to reproduce the analysis and export the updated metrics summary and plot:
+## How to run
 
 ```bash
 python training_metrics.py
 ```
 
-This will generate:
-
+This command will generate:
 - `metrics_summary.txt`
 - `metrics_visualization.png`
 
-## Repository files
-
-- `MAKE_MOONS_PROJECT.ipynb` — original notebook implementation
-- `training_metrics.py` — reusable script for training and full metric evaluation
-- `metrics_summary.txt` — current empirical metrics summary
-- `metrics_visualization.png` — training/loss and metric visualization
-
 ## Summary
 
-This project demonstrates a clean workflow for training a binary classifier on a non-linear dataset: generate data, standardize features, train a small neural network, evaluate the model with a rich set of metrics, and communicate the results clearly.
+This project introduces a complete machine learning pipeline: generating a non-linear dataset, standardizing features, training a PyTorch classifier, visualizing learning behavior, and evaluating performance with a broad set of metrics. It is a compact but effective demonstration of how neural networks handle non-linear classification problems and how model quality should be judged beyond accuracy alone.
