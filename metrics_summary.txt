@@ -1,8 +1,20 @@
 ===============================
-      CLASSIFICATION METRICS
+      MODEL EVALUATION SUMMARY
 ===============================
-Accuracy:  0.8150
+Accuracy: 0.8150
 Precision: 0.8000
-Recall:    0.8400
-F1-Score:  0.8195
+Recall: 0.8400
+F1-Score: 0.8195
+
+Additional metrics are computed by the evaluation script:
+- Balanced Accuracy
+- ROC-AUC
+- Log Loss
+- MCC
+- Pearson r
+- Spearman rho
+
+The original notebook produced the observed classification values above.
+The comprehensive metric calculations are available via the script:
+python training_metrics.py
 ===============================
